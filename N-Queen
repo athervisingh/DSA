@@ -1,0 +1,84 @@
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) {
+        int n = 4;  // Board size: 4x4
+
+        // 2D array initialize, 0 = empty cell, 1 = queen
+        int[][] arr = new int[n][n];
+
+        /*
+        N-Queens Algorithm:
+        - Goal: Place N queens on NxN board such that no two queens attack each other.
+        - Approach: Backtracking
+            1. Start from the first column.
+            2. Try placing a queen in each row of the current column.
+            3. For each placement, check if it's safe (no queens in the same row, upper-left, or lower-left diagonals).
+            4. If safe, place the queen and move to next column (recursive call).
+            5. After returning (backtrack), remove the queen and try next row.
+            6. When all columns are processed, we have a valid solution. Print or store it.
+        */
+
+        // Start solving from column 0
+        solve(arr, n, n, 0);
+    }
+
+    // Recursive function to try placing queens in columns
+    public static void solve(int[][] arr, int row, int col, int j) {
+        // Base case: All columns are processed, print solution
+        if (j >= col) {
+            printBoard(arr, row, col);
+            System.out.println(); // One line gap between solutions
+            return;
+        }
+
+        // Try placing queen in each row of current column
+        for (int i = 0; i < row; i++) {
+            if (isSafe(arr, row, col, i, j)) { // Check if current cell is safe
+                arr[i][j] = 1;                 // Place queen
+                solve(arr, row, col, j + 1);   // Move to next column
+                arr[i][j] = 0;                 // Backtrack: remove queen
+            }
+        }
+    }
+
+    // Function to check if placing queen at (i,j) is safe
+    public static boolean isSafe(int[][] arr, int row, int col, int i, int j) {
+        // 1. Check row on left side
+        for (int k = 0; k < j; k++) {
+            if (arr[i][k] == 1) return false;
+        }
+
+        // 2. Check upper-left diagonal
+        int k = i - 1, p = j - 1;
+        while (k >= 0 && p >= 0) {
+            if (arr[k][p] == 1) return false;
+            k--;
+            p--;
+        }
+
+        // 3. Check lower-left diagonal
+        k = i + 1; p = j - 1;
+        while (k < row && p >= 0) {
+            if (arr[k][p] == 1) return false;
+            k++;
+            p--;
+        }
+
+        return true; // Safe to place queen
+    }
+
+    // Function to print board with 'Q' for queen and '-' for empty
+    public static void printBoard(int[][] arr, int row, int col) {
+        for (int i = 0; i < row; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < col; j++) {
+                if (arr[i][j] == 1) sb.append("Q "); // Queen
+                else sb.append("- ");               // Empty cell
+            }
+            System.out.println(sb.toString().trim());
+        }
+    }
+}
