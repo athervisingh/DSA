@@ -1,0 +1,71 @@
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) {
+        int n = 4;  // Board size
+        int[][] board = new int[n][n];
+
+        // 3 boolean arrays for O(1) safe check
+        boolean[] rowUsed = new boolean[n];
+        boolean[] upperDiag = new boolean[2 * n - 1]; // i + j
+        boolean[] lowerDiag = new boolean[2 * n - 1]; // n - 1 + i - j
+
+        // Start solving from column 0
+        solve(board, n, 0, rowUsed, upperDiag, lowerDiag);
+    }
+
+    // Recursive function to place queens
+    public static void solve(int[][] board, int n, int col,
+                             boolean[] rowUsed, boolean[] upperDiag, boolean[] lowerDiag) {
+        // Base case: all columns processed
+        if (col >= n) {
+            printBoard(board, n);
+            System.out.println(); // blank line between solutions
+            return;
+        }
+
+        // Try placing queen in each row
+        for (int i = 0; i < n; i++) {
+            if (isSafe(i, col, n, rowUsed, upperDiag, lowerDiag)) {
+                // Place queen
+                board[i][col] = 1;
+                rowUsed[i] = true;
+                upperDiag[i + col] = true;
+                lowerDiag[n - 1 + i - col] = true;
+
+                // Recurse for next column
+                solve(board, n, col + 1, rowUsed, upperDiag, lowerDiag);
+
+                // Backtrack
+                board[i][col] = 0;
+                rowUsed[i] = false;
+                upperDiag[i + col] = false;
+                lowerDiag[n - 1 + i - col] = false;
+            }
+        }
+    }
+
+    // Optimized O(1) isSafe function
+    public static boolean isSafe(int row, int col, int n,
+                                 boolean[] rowUsed,
+                                 boolean[] upperDiag,
+                                 boolean[] lowerDiag) {
+        if (rowUsed[row]) return false;
+        if (upperDiag[row + col]) return false;
+        if (lowerDiag[n - 1 + row - col]) return false;
+        return true;
+    }
+
+    // Print board with Q for queen and - for empty
+    public static void printBoard(int[][] board, int n) {
+        for (int i = 0; i < n; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < n; j++) {
+                sb.append(board[i][j] == 1 ? "Q " : "- ");
+            }
+            System.out.println(sb.toString().trim());
+        }
+    }
+}
